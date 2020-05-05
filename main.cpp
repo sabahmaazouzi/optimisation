@@ -1,4 +1,10 @@
-
+//
+//  main.cpp
+//  quasi newton
+//
+//  Created by MacBook Pro on 5/1/20.
+//  Copyright © 2020 MacBook Pro. All rights reserved.
+//
 
 #include <iostream>
 #include <vector>
@@ -19,21 +25,21 @@ float fonction(vector<float> x)
     
     
 }
-vector<float> gradientf(vector<float> x) //graduient
+vector<float> gradientf(vector<float> a) //graduient
 {vector<float> f(len,0);
     for(int i=0;i<len;i++)
         { if (i==0)
-            f[i]=(1+4*(x[0])+2*(x[1]));
+            f[i]=(1+4*(a[0])+2*(a[1]));
            else
-               f[i]=(-1+2*x[0]+2*x[1]);}
+               f[i]=(-1+2*a[0]+2*a[1]);}
     return f;
 }
 
-float produit_tv(vector<float>x,vector<float> y) //produit scalaire de 2 vecteurs
+float produit_tv(vector<float>a,vector<float> y) //produit scalaire de 2 vecteurs
 
 {   float s =0;
     for(int i=0;i<len;i++)
-        s=s+((x[i])*(y[i]));
+        s=s+((a[i])*(y[i]));
     return s ;
     
 }
@@ -55,11 +61,11 @@ vector<float> y(vector<float>a ,vector<float>b )
         
     }
 
-vector <vector<float>> produitv(vector<float> x,vector<float> y)              //produit  de 2 vecteurs
+vector <vector<float>> produitv(vector<float> a,vector<float> y)              //produit  de 2 vecteurs
 {vector <vector<float>> p={{0,0},{0,0}};;
     for(int i=0;i<len;i++)
         {for(int j=0;j<len;j++)
-            p[i][j]=((x[i])*(y[j]));
+            p[i][j]=((a[i])*(y[j]));
     }
     return p ;
     
@@ -97,7 +103,9 @@ vector <vector<float>> A()
    // vector <vector<float>> p(2,0);
     float  dt_y=0;
    dt_y =produit_tv(d, y(x, somme(x, alphaxvect(alpha, d))));
-    std::cout <<"lll"<<":"<<1/dt_y <<endl;
+    for(int i=0;i<len;i++)
+      //  std::cout <<"lll"<<":"<< <<endl;
+    std::cout <<"lll"<<":"<<dt_y <<endl;
     for(int i=0;i<len;i++)
     {for (int j=0;j<len;j++)
         d_dt[i][j]=d_dt[i][j]*alpha/dt_y;}
@@ -151,6 +159,7 @@ if (fonction(somme(x, alphaxvect(alphac, d)))>(fonction(x)+0.1*alphac *produit_t
     {
         sup=alphac;
         alphac=0.5*(inf+sup);
+         iteration++;
         
     }
 else{
@@ -158,7 +167,9 @@ else{
         {inf =alphac;
             alphac=0.5*(inf+sup);}
     else
-        trouve = true;}
+        trouve = true;
+    iteration++;
+}
 }
 
     return alphac;
@@ -174,20 +185,22 @@ vector <float> quasi_newton()
 {
     k=0;
     vector <float> x={0,0},g =gradientf(x);
-    
-    while (norme(gradientf(x))>0.01)
+        std::cout <<"foncde"<<":"<<fonction(x) <<endl;
+    while (norme(gradientf(x))>0.1)
         {
             d=alphaxvect(-1, produitmv(h, g))  ;
              for (int i=0;i<len;i++)
                          std::cout <<"d"<<i<<":"<<d[i] <<endl;
             alpha = wolfe_rule();
             std::cout <<"pas"<<k<<":"<<alpha <<endl;
-            x=somme(x,alphaxvect(-alpha, d));
+            x=somme(x,alphaxvect(alpha, d));
              for (int i=0;i<len;i++)
-             std::cout <<"xxx"<<i<<":"<<x[i] <<endl;
+             std::cout <<"xxx"<<k<<i<<":"<<x[i] <<endl;
             g=gradientf(x);
             for (int i=0;i<len;i++)
             std::cout <<"gggg"<<i<<":"<<g[i] <<endl;
+            float w=fonction(x);
+              std::cout <<"fonc"<<k<<":"<<w <<endl;
             h=d_f_p();
             k=k+1;
         }
